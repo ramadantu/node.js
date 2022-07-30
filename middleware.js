@@ -1,5 +1,6 @@
 const math = require('mathjs')
 const express = require('express')
+const rateLimit = require("express-rate-limit")
 const app = express()
 
 const expression = []
@@ -20,9 +21,14 @@ const bodyLimiter = (req, res, next) => {
     }
 }
 
+const connectionLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 20
+})
+
 app.use(bodyLimiter)
 
-app.post("/calculate", (req, res) => {
+app.post("/calculate", connectionLimiter, (req, res) => {
     res.status(200)
     res.send(result)
 })
